@@ -23,6 +23,12 @@ CREATE TABLE has_composed(cmpr_no INTEGER NOT NULL, cmpn_no INTEGER NOT NULL);
 
 CREATE TABLE composition(c_no INTEGER NOT NULL, comp_date DATE NOT NULL, 
 c_title VARCHAR(40) NOT NULL, c_in INTEGER NOT NULL);
+
+CREATE TABLE concert(concert_no INTEGER NOT NULL, concert_venue VARCHAR(20), concert_in INTEGER NOT NULL, con_date DATE NOT NULL,
+concert_orgniser INTEGER NOT NULL);
+
+CREATE TABLE Performances(pfrmnc_no INTEGER NOT NULL, gave INTEGER NOT NULL, performed INTEGER NOT NULL,
+conducted_by INTEGER NOT NULL, performed_in INTEGER NOT NULL);
 -- Adicionar las restricciones declarativas a la base de datos (Atributos, Primarias, Únicas, Foraneas) 
 
 ALTER TABLE musician ADD CONSTRAINT PK_musician 
@@ -40,12 +46,17 @@ ALTER TABLE place ADD CONSTRAINT PK_place
 ALTER TABLE composer ADD CONSTRAINT PK_composer
     PRIMARY KEY(comp_no);
 
-
 ALTER TABLE composition ADD CONSTRAINT PK_composition
     PRIMARY KEY(c_no);
 
 ALTER TABLE has_composed ADD CONSTRAINT PK_has_composed
     PRIMARY KEY(cmpr_no, cmpn_no);
+
+ALTER TABLE concert ADD CONSTRAINT PK_CONCERT
+    PRIMARY KEY(concert_no);
+
+ALTER TABLE Performances ADD CONSTRAINT PK_PERFORMANCE
+    PRIMARY KEY(pfrmnc_no);
     
 --FORANEAS 
 
@@ -82,6 +93,18 @@ ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
 ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composition
     FOREIGN KEY(cmpn_no) REFERENCES composition(c_no);
 
+ALTER TABLE concert ADD CONSTRAINT FK_concert_place
+    FOREIGN KEY(concert_in) REFERENCES place(place_no);
+
+ALTER TABLE concert ADD CONSTRAINT FK_concert_musician
+    FOREIGN KEY(concert_orgniser) REFERENCES musician(m_no);
+
+ALTER TABLE Performances ADD CONSTRAINT FK_performances_musician
+    FOREIGN KEY(conducted_by) REFERENCES musician(m_no);
+
+ALTER TABLE Performances ADD CONSTRAINT FK_Performances_concert
+    FOREIGN KEY(performed_in) REFERENCES concert(concert_no);
+
 -- UNIQUE 
 
 ALTER TABLE musician ADD CONSTRAINT UK_musician
@@ -109,15 +132,10 @@ ALTER TABLE band DROP CONSTRAINT FK_band_musician;
 ALTER TABLE band DROP CONSTRAINT FK_place_band;
 
 ALTER TABLE band ADD CONSTRAINT FK_place_musician
-    FOREIGN KEY(band_contact) REFERENCES musician(m_no) 
-    ON UPDATE CASCADE
-    ON DELETE CASCADE;
+    FOREIGN KEY(band_contact) REFERENCES musician(m_no) ON DELETE CASCADE;
 
 ALTER TABLE band ADD CONSTRAINT FK_place_band
-   FOREIGN KEY(band_home) 
-   REFERENCES place(place_no) 
-   ON update CASCADE
-   ON DELETE CASCADE;
+   FOREIGN KEY(band_home) REFERENCES place(place_no) ON DELETE CASCADE;
 
 
 --Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
