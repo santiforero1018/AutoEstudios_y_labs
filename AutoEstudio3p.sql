@@ -1,0 +1,130 @@
+--- TABLAS
+CREATE TABLE musician(m_no INTEGER NOT NULL,
+m_name VARCHAR(20) NOT NULL, born DATE NOT NULL, died DATE,
+born_in INTEGER NOT NULL,living_in INTEGER NOT NULL);
+
+CREATE TABLE performer(perf_no INTEGER NOT NULL, perf_is INTEGER NOT NULL, 
+instrument VARCHAR(10), 
+perf_type VARCHAR(10) NOT NULL);
+
+CREATE TABLE plays_in(player INTEGER NOT NULL, band_id INTEGER NOT NULL);
+
+CREATE TABLE band(band_no INTEGER NOT NULL, band_name VARCHAR(10) NOT NULL,
+band_home INTEGER NOT NULL, band_type VARCHAR(10) NOT NULL, b_date DATE NOT NULL,
+band_contact INTEGER NOT NULL);
+
+CREATE TABLE place(place_no INTEGER NOT NULL, place_town VARCHAR(20) NOT NULL,
+place_country VARCHAR(20) NOT NULL);
+
+CREATE TABLE composer(comp_no INTEGER NOT NULL, comp_is INTEGER NOT NULL,
+comp_type VARCHAR(10));
+
+CREATE TABLE has_composed(cmpr_no INTEGER NOT NULL, cmpn_no INTEGER NOT NULL);
+
+CREATE TABLE composition(c_no INTEGER NOT NULL, comp_date DATE NOT NULL, 
+c_title VARCHAR(40) NOT NULL, c_in INTEGER NOT NULL);
+-- Adicionar las restricciones declarativas a la base de datos (Atributos, Primarias, Únicas, Foraneas) 
+
+ALTER TABLE musician ADD CONSTRAINT PK_musician 
+    PRIMARY KEY(m_no);
+    
+ALTER TABLE performer ADD CONSTRAINT PK_performer
+    PRIMARY KEY(perf_no);
+
+ALTER TABLE band ADD CONSTRAINT PK_band
+    PRIMARY KEY(band_no);
+
+ALTER TABLE place ADD CONSTRAINT PK_place
+    PRIMARY KEY(place_no);
+    
+ALTER TABLE composer ADD CONSTRAINT PK_composer
+    PRIMARY KEY(comp_no);
+
+
+ALTER TABLE composition ADD CONSTRAINT PK_composition
+    PRIMARY KEY(c_no);
+
+ALTER TABLE has_composed ADD CONSTRAINT PK_has_composed
+    PRIMARY KEY(cmpr_no, cmpn_no);
+    
+--FORANEAS 
+
+ALTER TABLE musician ADD CONSTRAINT FK_musician
+    FOREIGN KEY(born_in) REFERENCES place(place_no);
+
+ALTER TABLE musician ADD CONSTRAINT FK2_musician
+    FOREIGN KEY(living_in) REFERENCES place(place_no);
+
+ALTER TABLE performer ADD CONSTRAINT FK_performer_musician
+    FOREIGN KEY(perf_is) REFERENCES musician(m_no);
+
+ALTER TABLE band ADD CONSTRAINT FK_band_musician
+    FOREIGN KEY(band_contact) REFERENCES musician(m_no);
+
+ALTER TABLE composer ADD CONSTRAINT FK_composer_musician
+    FOREIGN KEY(comp_is) REFERENCES musician(m_no);
+
+ALTER TABLE composition ADD CONSTRAINT FK_place_composition
+    FOREIGN KEY(c_in) REFERENCES place(place_no);
+
+ALTER TABLE band ADD CONSTRAINT FK_place_band
+    FOREIGN KEY(band_home) REFERENCES place(place_no);
+    
+ALTER TABLE plays_in ADD CONSTRAINT FK_band_plays_in
+    FOREIGN KEY(band_id) REFERENCES band(band_no);
+    
+ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composer
+    FOREIGN KEY(cmpr_no) REFERENCES composer(comp_no);
+
+ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
+    FOREIGN KEY(player) REFERENCES performer(perf_no);
+
+ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composition
+    FOREIGN KEY(cmpn_no) REFERENCES composition(c_no);
+
+-- UNIQUE 
+
+ALTER TABLE musician ADD CONSTRAINT UK_musician
+    UNIQUE (m_name, born, died);
+    
+ALTER TABLE band ADD CONSTRAINT UK_band
+    UNIQUE (band_name);
+    
+ALTER TABLE place ADD CONSTRAINT UK_place
+    UNIQUE (place_town, place_country);
+    
+ALTER TABLE composition ADD CONSTRAINT UK_composition
+    UNIQUE (c_title);
+
+--- Atributos
+
+ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_TYPE
+    CHECK(REGEXP_LIKE(band_type, '^[[:alpha:]]{10}'));
+
+ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_NAME
+    CHECK(REGEXP_LIKE(band_name, '^[[:alpha:]]{1,20}'));
+
+--- Acciones
+ALTER TABLE band DROP CONSTRAINT FK_band_musician;
+ALTER TABLE band DROP CONSTRAINT FK_place_band;
+
+ALTER TABLE band ADD CONSTRAINT FK_place_musician
+    FOREIGN KEY(band_contact) REFERENCES musician(m_no) 
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+
+ALTER TABLE band ADD CONSTRAINT FK_place_band
+   FOREIGN KEY(band_home) 
+   REFERENCES place(place_no) 
+   ON update CASCADE
+   ON DELETE CASCADE;
+
+
+--Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
+insert into place (place_no, place_town, place_country)
+  values (1,'Mariano','payaso');
+
+---XTablas
+ALTER TABLE musician DROP CONSTRAINT FK_musician;
+DROP TABLE musician;
+DROP TABLE place;
