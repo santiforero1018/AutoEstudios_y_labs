@@ -29,7 +29,7 @@ concert_orgniser INTEGER NOT NULL);
 
 CREATE TABLE Performances(pfrmnc_no INTEGER NOT NULL, gave INTEGER NOT NULL, performed INTEGER NOT NULL,
 conducted_by INTEGER NOT NULL, performed_in INTEGER NOT NULL);
--- Adicionar las restricciones declarativas a la base de datos (Atributos, Primarias, Únicas, Foraneas) 
+-- Adicionar las restricciones declarativas a la base de datos (Atributos, Primarias, Ãšnicas, Foraneas) 
 
 ALTER TABLE musician ADD CONSTRAINT PK_musician 
     PRIMARY KEY(m_no);
@@ -60,10 +60,10 @@ ALTER TABLE Performances ADD CONSTRAINT PK_PERFORMANCE
     
 --FORANEAS 
 
-ALTER TABLE musician ADD CONSTRAINT FK_musician
+ALTER TABLE musician ADD CONSTRAINT FK_musician_place
     FOREIGN KEY(born_in) REFERENCES place(place_no);
 
-ALTER TABLE musician ADD CONSTRAINT FK2_musician
+ALTER TABLE musician ADD CONSTRAINT FK2_musician_place
     FOREIGN KEY(living_in) REFERENCES place(place_no);
 
 ALTER TABLE performer ADD CONSTRAINT FK_performer_musician
@@ -138,7 +138,7 @@ ALTER TABLE band ADD CONSTRAINT FK_place_band
    FOREIGN KEY(band_home) REFERENCES place(place_no) ON DELETE CASCADE;
 
 
---Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
+--Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generaciÃ³n de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
 insert into place (place_no, place_town, place_country)
   values (1,'Mariano','payaso');
 
