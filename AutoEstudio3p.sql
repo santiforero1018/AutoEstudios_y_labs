@@ -189,6 +189,17 @@ ALTER TABLE Performances ADD CONSTRAINT FK_performances_musician
 ALTER TABLE Performances ADD CONSTRAINT FK_Performances_concert
     FOREIGN KEY(performed_in) REFERENCES concert(concert_no) ON DELETE CASCADE;
 
+---Disparadores
+CREATE TRIGGER TriggernumerationBand
+BEFORE INSERT ON band
+FOR EACH ROW
+DECLARE
+noband INTEGER;
+BEGIN
+SELECT COUNT(*)+1 INTO noband FROM band;
+:new.band_no := noband;
+END TriggernumerationBand;
+
 
 --Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
 insert into place (place_no, place_town, place_country)
