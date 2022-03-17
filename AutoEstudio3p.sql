@@ -202,8 +202,14 @@ END TriggernumerationBand;
 
 
 --Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
-insert into place (place_no, place_town, place_country)
-  values (1,'Mariano','payaso');
+INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
+    VALUES (1,'ricardo','01/11/1980','',1,1);
+
+INSERT INTO place (place_no, place_town, place_country)
+  VALUES (1,'Quibdo','Colombia');
+  
+insert into band ( band_name, band_home, band_type, b_date, band_contact)
+  values ('LOL','sql', 'salsa', '01/12/2220', '1');
 
 ---XTablas
 ALTER TABLE musician DROP CONSTRAINT FK_musician;
