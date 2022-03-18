@@ -257,4 +257,6 @@ DROP TABLE has_composed;
 DROP TABLE composer;
 DROP TABLE performer;
 DROP TABLE concert;
+DROP TABLE band;
+DROP TABLE perfomances;
 
