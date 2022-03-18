@@ -223,6 +223,10 @@ INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
   
 insert into band ( band_name, band_home, band_type, band_contact)
   values ('COD',2, 'salsaooooo', 2);
+  
+ --insert into band ( band_name, band_home, band_type, band_contact)
+--  values ('salsaooooo',2, 'salsaooooo', 2);
+
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
 BEFORE INSERT ON band
@@ -258,5 +262,5 @@ DROP TABLE composer;
 DROP TABLE performer;
 DROP TABLE concert;
 DROP TABLE band;
-DROP TABLE perfomances;
+DROP TABLE performances;
 
