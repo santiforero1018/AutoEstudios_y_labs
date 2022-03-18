@@ -21,7 +21,7 @@ CREATE TABLE exclusiveness (account_id INTEGER NOT NULL,code VARCHAR(9) NOT NULL
 price INTEGER, eduracion INTEGER NOT NULL);
 
 CREATE TABLE subscriptions (id_subscriptor INTEGER NOT NULL, createdAt DATE NOT NULL, account_id INTEGER NOT NULL,
-detail VARCHAR(50));
+account_idTwo INTEGER NOT NULL ,detail VARCHAR(50));
 
 CREATE TABLE stages (id_subscription INTEGER NOT NULL, id_stage INTEGER NOT NULL, exc_id INTEGER NOT NULL,
 exc_order INTEGER NOT NULL, startAt DATE NOT NULL, endAT DATE, price INTEGER NOT NULL, status CHAR);
@@ -60,7 +60,7 @@ ALTER TABLE stages ADD CONSTRAINT PK_stages
     PRIMARY KEY(id_subscription, id_stage);
 
 ALTER TABLE lables ADD CONSTRAINT PK_lables
-    PRIMARY KEY(lorder);
+    PRIMARY KEY(lorder,account_id, lable);
 
 --- Unicas
 ALTER TABLE usuarios ADD CONSTRAINT uk_user
@@ -88,9 +88,11 @@ FOREIGN KEY (content_id) REFERENCES contenidos(id_contenido);
 ALTER TABLE accounts ADD CONSTRAINT FK_usuarios_accounts
 FOREIGN KEY (id_user) REFERENCES usuarios(id_usuario);
 
-
 ALTER TABLE exclusiveness ADD CONSTRAINT FK_accounts_exclusiveness
 FOREIGN KEY (account_id) REFERENCES accounts(id_account);
+
+ALTER TABLE subscriptions ADD CONSTRAINT FK_accounts_subscritions
+FOREIGN KEY (account_idTwo) REFERENCES accounts(id_account);
 
 ALTER TABLE subscriptions ADD CONSTRAINT FK_accounts_subscritions
 FOREIGN KEY (account_id) REFERENCES accounts(id_account);
@@ -102,7 +104,7 @@ ALTER TABLE stages ADD CONSTRAINT FK_exclusiveness_stages
 FOREIGN KEY (exc_id, exc_order) REFERENCES exclusiveness(account_id, eorder);
 
 ALTER TABLE lables ADD CONSTRAINT FK_exclusiveness_lables 
-FOREIGN KEY (lorder, id_account) REFERENCES exclusiveness(eorder,account_id, eorder);
+FOREIGN KEY (lorder, id_account) REFERENCES exclusiveness(eorder,account_id);
 
 --- PoblarOk
 INSERT INTO usuarios(id_usuario, email, user_name, createdAt) VALUES(12345, 'juanydanni94@gmail.com', 'Juan', '20/09/2017');
@@ -217,6 +219,7 @@ ALTER TABLE posts DROP CONSTRAINT  FK_contenidos_posts;
 ALTER TABLE accounts DROP CONSTRAINT  FK_usuarios_accounts;
 ALTER TABLE exclusiveness DROP CONSTRAINT  FK_accounts_exclusiveness;
 ALTER TABLE subscriptions DROP CONSTRAINT  FK_accounts_subscritions;
+ALTER TABLE subscriptions DROP CONSTRAINT FK2_accounts_subscritions;
 ALTER TABLE stages DROP CONSTRAINT  FK_subscription_stages;
 ALTER TABLE stages DROP CONSTRAINT  FK_exclusiveness_stages;
 ALTER TABLE lables DROP CONSTRAINT FK_exclusiveness_lables;
