@@ -158,7 +158,6 @@ ALTER TABLE band ADD CONSTRAINT FK_band_musician
 
 ALTER TABLE composer ADD CONSTRAINT FK_composer_musician
     FOREIGN KEY(comp_is) REFERENCES musician(m_no) ON DELETE CASCADE;
-<<<<<<< HEAD
 
 ALTER TABLE composition ADD CONSTRAINT FK_composition_place
     FOREIGN KEY(c_in) REFERENCES place(place_no) ON DELETE CASCADE;
@@ -175,8 +174,6 @@ ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composer
 ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
     FOREIGN KEY(player) REFERENCES performer(perf_no) ON DELETE CASCADE;
 
-=======
-
 ALTER TABLE composition ADD CONSTRAINT FK_composition_place
     FOREIGN KEY(c_in) REFERENCES place(place_no) ON DELETE CASCADE;
 
@@ -192,14 +189,11 @@ ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composer
 ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
     FOREIGN KEY(player) REFERENCES performer(perf_no) ON DELETE CASCADE;
 
->>>>>>> e9db3328ecf8bed75d70a61145551eccdcf8971e
 ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composition
     FOREIGN KEY(cmpn_no) REFERENCES composition(c_no) ON DELETE CASCADE;
 
 ALTER TABLE concert ADD CONSTRAINT FK_concert_place
     FOREIGN KEY(concert_in) REFERENCES place(place_no) ON DELETE CASCADE;
-<<<<<<< HEAD
-=======
 
 ALTER TABLE concert ADD CONSTRAINT FK_concert_musician
     FOREIGN KEY(concert_orgniser) REFERENCES musician(m_no) ON DELETE CASCADE;
@@ -209,17 +203,6 @@ ALTER TABLE Performances ADD CONSTRAINT FK_performances_musician
 
 ALTER TABLE Performances ADD CONSTRAINT FK_Performances_concert
     FOREIGN KEY(performed_in) REFERENCES concert(concert_no) ON DELETE CASCADE;
-
----Disparadores
-CREATE TRIGGER TriggernumerationBand
-BEFORE INSERT ON band
-FOR EACH ROW
-DECLARE
-noband INTEGER;
-BEGIN
-SELECT COUNT(*)+1 INTO noband FROM band;
-:new.band_no := noband;
-END TriggernumerationBand;
 
 
 --Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generaciÃ³n de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
@@ -231,27 +214,8 @@ INSERT INTO place (place_no, place_town, place_country)
   
 insert into band ( band_name, band_home, band_type, b_date, band_contact)
   values ('LOL','sql', 'salsa', '01/12/2220', '1');
->>>>>>> e9db3328ecf8bed75d70a61145551eccdcf8971e
-
-ALTER TABLE concert ADD CONSTRAINT FK_concert_musician
-    FOREIGN KEY(concert_orgniser) REFERENCES musician(m_no) ON DELETE CASCADE;
-
-ALTER TABLE Performances ADD CONSTRAINT FK_performances_musician
-    FOREIGN KEY(conducted_by) REFERENCES musician(m_no) ON DELETE CASCADE;
-
-ALTER TABLE Performances ADD CONSTRAINT FK_Performances_concert
-    FOREIGN KEY(performed_in) REFERENCES concert(concert_no) ON DELETE CASCADE;
 
 
---Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
-INSERT INTO place (place_no, place_town, place_country)
-  VALUES (1,'Quibdo','Colombia');
-
-INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
-    VALUES (1,'ricardo','01/11/1980','',1,1);
-
-insert into band (band_name, band_home, band_type, b_date, band_contact)
-  values ('LOL',1, 'salsaOOOOO', '01/12/2220', '1');
 
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
