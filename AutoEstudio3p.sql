@@ -218,6 +218,10 @@ insert into band ( band_name, band_home, band_type, band_contact)
  --insert into band ( band_name, band_home, band_type, band_contact)
 --  values ('salsaooooo',2, 'salsaooooo', 2);
 
+--CONSULTA
+SELECT band_no, band_name, band_home, band_type, b_date, band_contact, m_name
+FROM band JOIN musician ON(band_contact = m_no) JOIN performer ON(m_no = perf_is);
+
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
 BEFORE INSERT ON band
@@ -261,6 +265,7 @@ BEGIN
     :new.band_contact := :old.band_contact;
   END IF;
 END TriggerAllowsUpdate;
+
 ---Xdisparadores
 DROP TRIGGER TriggernumerationBand;
 DROP TRIGGER TriggeractualDate;
