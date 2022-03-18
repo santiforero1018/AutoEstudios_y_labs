@@ -10,7 +10,7 @@ perf_type VARCHAR(10) NOT NULL);
 CREATE TABLE plays_in(player INTEGER NOT NULL, band_id INTEGER NOT NULL);
 
 CREATE TABLE band(band_no INTEGER NOT NULL, band_name VARCHAR(10) NOT NULL,
-band_home INTEGER NOT NULL, band_type VARCHAR(10) NOT NULL, b_date DATE NOT NULL,
+band_home INTEGER NOT NULL, band_type VARCHAR(10), b_date DATE NOT NULL,
 band_contact INTEGER NOT NULL);
 
 CREATE TABLE place(place_no INTEGER NOT NULL, place_town VARCHAR(20) NOT NULL,
@@ -122,7 +122,7 @@ ALTER TABLE composition ADD CONSTRAINT UK_composition
 --- Atributos
 
 ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_TYPE
-    CHECK(REGEXP_LIKE(band_type, '^[[:alpha:]]{10}') AND band_name != band_type);
+    CHECK(REGEXP_LIKE(band_type, '^[[:alpha:]]{3,10}') AND band_name != band_type);
 
 ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_NAME
     CHECK(REGEXP_LIKE(band_name, '^[[:alpha:]]{1,20}'));
@@ -174,21 +174,6 @@ ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composer
 ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
     FOREIGN KEY(player) REFERENCES performer(perf_no) ON DELETE CASCADE;
 
-ALTER TABLE composition ADD CONSTRAINT FK_composition_place
-    FOREIGN KEY(c_in) REFERENCES place(place_no) ON DELETE CASCADE;
-
-ALTER TABLE band ADD CONSTRAINT FK_band_place
-    FOREIGN KEY(band_home) REFERENCES place(place_no) ON DELETE CASCADE;
-    
-ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_band
-    FOREIGN KEY(band_id) REFERENCES band(band_no) ON DELETE CASCADE;
-    
-ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composer
-    FOREIGN KEY(cmpr_no) REFERENCES composer(comp_no) ON DELETE CASCADE;
-
-ALTER TABLE plays_in ADD CONSTRAINT FK_plays_in_performer
-    FOREIGN KEY(player) REFERENCES performer(perf_no) ON DELETE CASCADE;
-
 ALTER TABLE has_composed ADD CONSTRAINT FK_has_composed_composition
     FOREIGN KEY(cmpn_no) REFERENCES composition(c_no) ON DELETE CASCADE;
 
@@ -223,6 +208,12 @@ INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
   
 insert into band ( band_name, band_home, band_type, band_contact)
   values ('COD',2, 'salsaooooo', 2);
+  
+insert into band ( band_name, band_home, band_contact)
+  values ('VALORANT',2, 2);
+
+insert into band ( band_name, band_home, band_type, band_contact)
+  values ('ForniteM',2, '',2);
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
 BEFORE INSERT ON band
@@ -243,12 +234,45 @@ BEGIN
     :new.b_date := fecha;
 END TriggeractualDate;
 
+CREATE TRIGGER TriggerDefaultType
+BEFORE INSERT ON band
+FOR EACH ROW
+DECLARE
+default_type VARCHAR(10) DEFAULT 'rock';
+BEGIN
+    IF :new.band_type IS NULL THEN
+        :new.band_type := default_type;
+    END IF;
+END TriggerDefaultType;
+
+CREATE TRIGGER TriggerAllowsUpdate
+BEFORE UPDATE ON band
+FOR EACH ROW
+BEGIN
+  IF :new.band_no <> :old.band_no or :new.band_name<> :old.band_name or :new.band_home<>:old.band_home or :new.b_date<> :old.b_date or :new.band_contact<> :old.band_contact THEN
+    :new.band_no:=:old.band_no; 
+    :new.band_name:= :old.band_name;
+    :new.band_home:=:old.band_home;
+    :new.b_date:= :old.b_date;
+    :new.band_contact := :old.band_contact;
+  END IF;
+END TriggerAllowsUpdate;
 ---Xdisparadores
 DROP TRIGGER TriggernumerationBand;
 DROP TRIGGER TriggeractualDate;
+DROP TRIGGER TriggerDefaultType;
+DROP TRIGGER TriggerAllowsUpdate;
 DELETE FROM musician;
 DELETE FROM place;
 ---XTablas
 ALTER TABLE musician DROP CONSTRAINT FK_musician;
+DROP TABLE composition;
 DROP TABLE musician;
 DROP TABLE place;
+DROP TABLE plays_in;
+DROP TABLE has_composed;
+DROP TABLE composer;
+DROP TABLE performer;
+DROP TABLE concert;
+DROP TABLE band;
+DROP TABLE performances;
