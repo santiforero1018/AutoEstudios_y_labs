@@ -122,7 +122,7 @@ ALTER TABLE composition ADD CONSTRAINT UK_composition
 --- Atributos
 
 ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_TYPE
-    CHECK(REGEXP_LIKE(band_type, '^[[:alpha:]]{10}'));
+    CHECK(REGEXP_LIKE(band_type, '^[[:alpha:]]{10}') AND band_name != band_type);
 
 ALTER TABLE band ADD CONSTRAINT CK_BAND_BAND_NAME
     CHECK(REGEXP_LIKE(band_name, '^[[:alpha:]]{1,20}'));
@@ -206,17 +206,23 @@ ALTER TABLE Performances ADD CONSTRAINT FK_Performances_concert
 
 
 --Poblar la base de datos con los datos iniciales (PoblarOK) Automaticen la generación de las instrucciones INSERT. Dejen en el archivo las consultas correspondientes en comentarios.
-INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
-    VALUES (1,'ricardo','01/11/1980','',1,1);
-
 INSERT INTO place (place_no, place_town, place_country)
   VALUES (1,'Quibdo','Colombia');
+
+INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
+    VALUES (1,'ricardo','01/11/1980','',1,1);
   
-insert into band ( band_name, band_home, band_type, b_date, band_contact)
-  values ('LOL','sql', 'salsa', '01/12/2220', '1');
+insert into band ( band_name, band_home, band_type, band_contact)
+  values ('LOL',1, 'salsaooooo', 1);
 
+INSERT INTO place (place_no, place_town, place_country)
+  VALUES (2,'New York','EEUU');
 
-
+INSERT INTO musician (m_no, m_name, born, died, born_in, living_in)
+    VALUES (2,'Oscar','01/11/1980','',1,1);
+  
+insert into band ( band_name, band_home, band_type, band_contact)
+  values ('COD',2, 'salsaooooo', 2);
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
 BEFORE INSERT ON band
@@ -228,11 +234,20 @@ BEGIN
     :new.band_no := noband;
 END TriggernumerationBand;
 
+CREATE TRIGGER TriggeractualDate
+BEFORE INSERT ON band
+FOR EACH ROW
+DECLARE
+fecha DATE := CURRENT_DATE;
+BEGIN
+    :new.b_date := fecha;
+END TriggeractualDate;
+
 ---Xdisparadores
 DROP TRIGGER TriggernumerationBand;
+DROP TRIGGER TriggeractualDate;
 DELETE FROM musician;
 DELETE FROM place;
-DELETE FROM band;
 ---XTablas
 ALTER TABLE musician DROP CONSTRAINT FK_musician;
 DROP TABLE musician;
