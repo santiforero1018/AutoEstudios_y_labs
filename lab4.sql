@@ -1,32 +1,32 @@
 
 --- TABLAS
-CREATE TABLE usuarios (id_usuario INTEGER NOT NULL,
+CREATE TABLE usuarios (id_usuario NUMBER(5) NOT NULL,
 email VARCHAR(100)  NOT NULL, user_name VARCHAR(50) NOT NULL, createdAt DATE NOT NULL);
 
-CREATE TABLE contenidos (id_contenido INTEGER NOT NULL, id_exclusiveness INTEGER NOT NULL,
+CREATE TABLE contenidos (id_contenido NUMBER(10) NOT NULL, id_exclusiveness INTEGER NOT NULL,
 order_exc INTEGER, title VARCHAR(20) NOT NULL, publishingDate DATE NOT NULL, Cdescription VARCHAR(30));
 
-CREATE TABLE likes (user_id INTEGER NOT NULL, content_id INTEGER NOT NULL );
+CREATE TABLE likes (user_id NUMBER(5) NOT NULL, content_id NUMBER(10) NOT NULL );
 
-CREATE TABLE videos (content_id INTEGER NOT NULL, Vduration INTEGER NOT NULL);
+CREATE TABLE videos (content_id NUMBER(10) NOT NULL, Vduration INTEGER NOT NULL);
 
-CREATE TABLE eventos (content_id INTEGER NOT NULL , plannedDate DATE  NOT NULL, actualDate DATE, duracion INTEGER); 
+CREATE TABLE eventos (content_id NUMBER(10) NOT NULL , plannedDate DATE  NOT NULL, actualDate DATE, duracion INTEGER); 
 
-CREATE TABLE posts (content_id INTEGER NOT NULL, ptext VARCHAR(50));
+CREATE TABLE posts (content_id NUMBER(10) NOT NULL, ptext VARCHAR(50));
 
-CREATE TABLE accounts (id_account INTEGER NOT NULL, aname VARCHAR(70) NOT NULL, 
-createdAt DATE NOT NULL, subscribers INTEGER NOT NULL, id_user INTEGER NOT NULL);
+CREATE TABLE accounts (id_account NUMBER(5) NOT NULL, aname VARCHAR(70) NOT NULL, 
+createdAt DATE NOT NULL, subscribers NUMBER(5) NOT NULL, id_user INTEGER NOT NULL);
 
-CREATE TABLE exclusiveness (account_id INTEGER NOT NULL,code VARCHAR(9) NOT NULL, eorder INTEGER NOT NULL, ename VARCHAR(50)NOT NULL,
+CREATE TABLE exclusiveness (account_id NUMBER(5) NOT NULL,code VARCHAR(9) NOT NULL, eorder NUMBER(3) NOT NULL, ename VARCHAR(50)NOT NULL,
 price INTEGER, eduracion INTEGER NOT NULL);
 
-CREATE TABLE subscriptions (id_subscriptor INTEGER NOT NULL, createdAt DATE NOT NULL, account_id INTEGER NOT NULL,
-account_idTwo INTEGER NOT NULL ,detail VARCHAR(50));
+CREATE TABLE subscriptions (id_subscriptor NUMBER(5) NOT NULL, createdAt DATE NOT NULL, account_id NUMBER(5) NOT NULL,
+account_idTwo NUMBER(5) NOT NULL ,detail VARCHAR(50));
 
-CREATE TABLE stages (id_subscription INTEGER NOT NULL, id_stage INTEGER NOT NULL, exc_id INTEGER NOT NULL,
-exc_order INTEGER NOT NULL, startAt DATE NOT NULL, endAT DATE, price INTEGER NOT NULL, status CHAR);
+CREATE TABLE stages (id_subscription NUMBER(5) NOT NULL, id_stage NUMBER(5) NOT NULL, exc_id NUMBER(5) NOT NULL,
+exc_order NUMBER(3) NOT NULL, startAt DATE NOT NULL, endAT DATE, price INTEGER NOT NULL, status CHAR);
 
-CREATE TABLE lables (lorder INTEGER NOT NULL, account_id INTEGER NOT NULL, lable VARCHAR(10));
+CREATE TABLE lables (lorder NUMBER(3) NOT NULL, account_id NUMBER(5) NOT NULL, lable VARCHAR(10));
 
 --- Primarias
 ALTER TABLE usuarios ADD CONSTRAINT PK_usuarios
@@ -92,10 +92,10 @@ ALTER TABLE exclusiveness ADD CONSTRAINT FK_accounts_exclusiveness
 FOREIGN KEY (account_id) REFERENCES accounts(id_account);
 
 ALTER TABLE subscriptions ADD CONSTRAINT FK_accounts_subscritions
-FOREIGN KEY (account_idTwo) REFERENCES accounts(id_account);
-
-ALTER TABLE subscriptions ADD CONSTRAINT FK_accounts_subscritions
 FOREIGN KEY (account_id) REFERENCES accounts(id_account);
+
+ALTER TABLE subscriptions ADD CONSTRAINT FK2_accounts_subscritions
+FOREIGN KEY (account_idTwo) REFERENCES accounts(id_account);
 
 ALTER TABLE stages ADD CONSTRAINT FK_subscription_stages
 FOREIGN KEY (id_subscription) REFERENCES subscriptions (id_subscriptor);
@@ -105,6 +105,7 @@ FOREIGN KEY (exc_id, exc_order) REFERENCES exclusiveness(account_id, eorder);
 
 ALTER TABLE lables ADD CONSTRAINT FK_exclusiveness_lables 
 FOREIGN KEY (lorder, id_account) REFERENCES exclusiveness(eorder,account_id);
+
 
 --- PoblarOk
 INSERT INTO usuarios(id_usuario, email, user_name, createdAt) VALUES(12345, 'juanydanni94@gmail.com', 'Juan', '20/09/2017');
@@ -157,7 +158,6 @@ CHECK (REGEXP_LIKE (email, '^[[:alnum:]]{1,49}@[[:alpha:]]{1,46}.[[:alpha:]]{2,3
 ALTER TABLE contenidos ADD CONSTRAINT CH_contenidos_TContentId
 CHECK (REGEXP_LIKE(id_contenido, '^[[:alnum:]]{10}'));
 
-
 ALTER TABLE exclusiveness ADD CONSTRAINT CH_exclusiveness_TOrder
 CHECK (REGEXP_LIKE(eorder, '^[[:digit:]]{3}'));
 
@@ -185,7 +185,7 @@ ALTER TABLE posts ADD CONSTRAINT CH_posts_TText
 CHECK (ptext LIKE '[[:alpha:]]{2,27} [[:alpha:]]{2,26}');
 
 ALTER TABLE stages ADD CONSTRAINT CH_posts_TStatus
-CHECK (status = 'A' OR status = 'I');
+CHECK (status = 'G' OR status = 'P');
 
 ALTER TABLE usuarios ADD CONSTRAINT CH_usuarios_TIdUsers
 CHECK(REGEXP_LIKE(id_usuario, '^[[:digit:]]{5}'));
@@ -207,6 +207,38 @@ SELECT account_id, code, eorder, ename, price, eduracion
 FROM exclusiveness JOIN accounts ON (exclusiveness.account_id = accounts.id_account) JOIN usuarios ON (accounts.id_user = usuarios.id_usuario)
 WHERE user_name LIKE 'Juan%';
 
+--- DISPARADORES
+CREATE TRIGGER TriggeridSubscription
+BEFORE INSERT ON subscriptions
+FOR EACH ROW
+DECLARE
+idsubs NUMBER(5);
+BEGIN
+    SELECT COUNT(*)+1 INTO idsubs FROM band;
+    :new.id_subscriptor := idsubs;
+END TriggeridSubscription;
+--- drop trigger 
+DROP TRIGGER TriggeridSubscription;
+
+CREATE TRIGGER TriggeractualDate
+BEFORE INSERT ON subscriptions
+FOR EACH ROW
+DECLARE
+fecha DATE := CURRENT_DATE;
+BEGIN
+    :new.createAT := fecha;
+END TriggeractualDate;
+--- drop trigger 
+DROP TRIGGER TriggeractualDate;
+
+---CREATE TRIGGER TriggerStage
+---BEFORE INSERT ON stages
+---FOR EACH ROW 
+---DECLARE
+---free CHAR := 'G';
+---premium CHAR := 'P';
+---BEGIN 
+---    if new.price 
 --XTABLAS 
 -- DROP CONSTRAINT
 
