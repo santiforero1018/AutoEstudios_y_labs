@@ -214,6 +214,10 @@ insert into band ( band_name, band_home, band_contact)
 
 insert into band ( band_name, band_home, band_type, band_contact)
   values ('ForniteM',2, '',2);
+
+ --insert into band ( band_name, band_home, band_type, band_contact)
+--  values ('salsaooooo',2, 'salsaooooo', 2);
+
 ---Disparadores
 CREATE TRIGGER TriggernumerationBand
 BEFORE INSERT ON band
@@ -265,7 +269,9 @@ DROP TRIGGER TriggerAllowsUpdate;
 DELETE FROM musician;
 DELETE FROM place;
 ---XTablas
+
 ALTER TABLE musician DROP CONSTRAINT FK_musician;
+
 DROP TABLE composition;
 DROP TABLE musician;
 DROP TABLE place;
