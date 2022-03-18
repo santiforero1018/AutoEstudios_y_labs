@@ -249,6 +249,12 @@ DROP TRIGGER TriggeractualDate;
 DELETE FROM musician;
 DELETE FROM place;
 ---XTablas
-ALTER TABLE musician DROP CONSTRAINT FK_musician;
+DROP TABLE composition;
 DROP TABLE musician;
 DROP TABLE place;
+DROP TABLE plays_in;
+DROP TABLE has_composed;
+DROP TABLE composer;
+DROP TABLE performer;
+DROP TABLE concert;
+
