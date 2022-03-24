@@ -17,7 +17,7 @@ CREATE TABLE posts (content_id NUMBER(10) NOT NULL, ptext VARCHAR(50));
 CREATE TABLE accounts (id_account NUMBER(5) NOT NULL, aname VARCHAR(70) NOT NULL, 
 createdAt DATE NOT NULL, subscribers NUMBER(5) NOT NULL, id_user INTEGER NOT NULL);
 
-CREATE TABLE exclusiveness (account_id NUMBER(5) NOT NULL,code VARCHAR(9) NOT NULL, eorder NUMBER(3) NOT NULL, ename VARCHAR(50)NOT NULL,
+CREATE TABLE exclusiveness (account_id NUMBER(5) NOT NULL,code VARCHAR(9) NOT NULL, eorder NUMBER(3) DEFAULT 0 NOT NULL, ename VARCHAR(50)NOT NULL,
 price INTEGER, eduracion INTEGER NOT NULL);
 
 CREATE TABLE subscriptions (id_subscriptor NUMBER(5) NOT NULL, createdAt DATE NOT NULL, account_id NUMBER(5) NOT NULL,
@@ -104,7 +104,7 @@ ALTER TABLE stages ADD CONSTRAINT FK_exclusiveness_stages
 FOREIGN KEY (exc_id, exc_order) REFERENCES exclusiveness(account_id, eorder);
 
 ALTER TABLE lables ADD CONSTRAINT FK_exclusiveness_lables 
-FOREIGN KEY (lorder, id_account) REFERENCES exclusiveness(eorder,account_id);
+FOREIGN KEY (lorder, account_id) REFERENCES exclusiveness(eorder,account_id);
 
 
 --- PoblarOk
@@ -159,12 +159,10 @@ ALTER TABLE contenidos ADD CONSTRAINT CH_contenidos_TContentId
 CHECK (REGEXP_LIKE(id_contenido, '^[[:alnum:]]{10}'));
 
 ALTER TABLE exclusiveness ADD CONSTRAINT CH_exclusiveness_TOrder
-CHECK (REGEXP_LIKE(eorder, '^[[:digit:]]{3}'));
+CHECK (eorder >= 0);
 
 ALTER TABLE exclusiveness ADD CONSTRAINT CH_exclusiveness_TMoney
 CHECK (price >= 0 AND REGEXP_LIKE(price, '^[[:digit:]]{0,9}'));
-
-ALTER TABLE exclusiveness DROP CONSTRAINT CH_stages_TMoney;
 
 ALTER TABLE exclusiveness ADD CONSTRAINT CH_exclusiveness_TDays
 CHECK(eduracion >=1 AND eduracion <=90 AND REGEXP_LIKE(eduracion, '^[[:digit:]]{2}'));
@@ -208,37 +206,82 @@ FROM exclusiveness JOIN accounts ON (exclusiveness.account_id = accounts.id_acco
 WHERE user_name LIKE 'Juan%';
 
 --- DISPARADORES
-CREATE TRIGGER TriggeridSubscription
+CREATE TRIGGER TR_idSubscription
 BEFORE INSERT ON subscriptions
 FOR EACH ROW
 DECLARE
 idsubs NUMBER(5);
 BEGIN
-    SELECT COUNT(*)+1 INTO idsubs FROM band;
+    SELECT COUNT(*)+1 INTO idsubs FROM subscriptions;
     :new.id_subscriptor := idsubs;
-END TriggeridSubscription;
+END TR_idSubscription;
 --- drop trigger 
-DROP TRIGGER TriggeridSubscription;
+DROP TRIGGER TR_idSubscription;
 
-CREATE TRIGGER TriggeractualDate
+CREATE TRIGGER TR_actualDatesubs
 BEFORE INSERT ON subscriptions
+FOR EACH ROW
+BEGIN
+    :new.createdAT := SYSDATE;
+END TR_actualDatesubs;
+--- drop trigger 
+DROP TRIGGER TR_actualDatesubs;
+
+CREATE TRIGGER TR_Stage
+BEFORE INSERT ON stages
+FOR EACH ROW 
+DECLARE
+free CHAR := 'G';
+premium CHAR := 'P';
+orderEx NUMBER(3);
+BEGIN
+    SELECT eorder INTO orderEx FROM exclusiveness JOIN stages ON(exc_id = account_id AND exc_order = eorder );
+    IF orderEx = 0 THEN
+        :new.status := free;
+    ELSE
+        :new.status := premium;
+    END IF; 
+END TR_Stage;
+
+DROP TRIGGER TR_Stage;
+
+CREATE TRIGGER TR_IdUser
+BEFORE INSERT ON usuarios
+FOR EACH ROW 
+DECLARE 
+idUsers NUMBER(5);
+BEGIN
+    SELECT COUNT(*)+1 INTO idUsers FROM usuarios;
+    :new.id_usuario := idUsers;
+END TR_IdUser;
+
+DROP TRIGGER TR_IdUser;
+
+CREATE OR REPLACE TRIGGER TR_actualDate
+BEFORE INSERT ON usuarios
 FOR EACH ROW
 DECLARE
 fecha DATE := CURRENT_DATE;
 BEGIN
     :new.createAT := fecha;
-END TriggeractualDate;
+END TR_actualDate;
 --- drop trigger 
-DROP TRIGGER TriggeractualDate;
+DROP TRIGGER  TR_actualDate;
 
----CREATE TRIGGER TriggerStage
----BEFORE INSERT ON stages
----FOR EACH ROW 
----DECLARE
----free CHAR := 'G';
----premium CHAR := 'P';
----BEGIN 
----    if new.price 
+CREATE TRIGGER TR_NotModifiedUser
+BEFORE UPDATE ON usuarios
+FOR EACH ROW
+BEGIN
+    IF :new.id_usuario != :old.id_usuario OR :new.email != :old.email OR :new.user_name != :old.user_name OR :new.createdAt != :old.createdAt THEN
+        :new.id_usuario := :old.id_usuario;
+        :new.email := :old.email;
+        :new.user_name := :old.user_name;
+        :new.createdAt := :old.createdAt;
+    END IF;
+END TR_NotModifiedUser;
+
+DROP TRIGGER TR_NotModifiedUser;
+        
 --XTABLAS 
 -- DROP CONSTRAINT
 
