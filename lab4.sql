@@ -336,12 +336,22 @@ CREATE TRIGGER TR_NotModifiedUser
 BEFORE UPDATE ON usuarios
 FOR EACH ROW
 BEGIN
-    IF :new.id_usuario != :old.id_usuario OR :new.email != :old.email OR :new.user_name != :old.user_name OR :new.createdAt != :old.createdAt THEN
-        :new.id_usuario := :old.id_usuario;
-        :new.email := :old.email;
-        :new.user_name := :old.user_name;
-        :new.createdAt := :old.createdAt;
-    END IF;
+   IF updating('id_usuario') THEN
+    raise_application_error(-20001,'No se puede modificar el id del usuario');
+   END IF;
+   
+   IF updating('email') THEN
+    raise_application_error(-20001,'No se puede modificar el email del usuario');
+   END IF;
+   
+   IF updating('user_name') THEN
+    raise_application_error(-20001,'No se puede modificar el nombre del usuario');
+   END IF;
+   
+   IF updating('createdAt') THEN
+    raise_application_error(-20001,'No se puede modificar la fecha en la que se registra un usuario');
+   END IF;
+ 
 END TR_NotModifiedUser;
 
 DROP TRIGGER TR_NotModifiedUser;
