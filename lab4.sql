@@ -307,7 +307,7 @@ BEFORE DELETE ON subscriptions
 FOR EACH ROW
 BEGIN 
     IF :old.createdAt <= :old.createdAt + 2   THEN
-        DELETE FROM subscriptions WHERE 
+        DELETE FROM subscriptions WHERE :old.createdAt = (SELECT * FROM subscriptions WHERE )
 --
 CREATE TRIGGER TR_IdUser
 BEFORE INSERT ON usuarios
