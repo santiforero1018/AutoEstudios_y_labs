@@ -205,6 +205,11 @@ SELECT account_id, code, eorder, ename, price, eduracion
 FROM exclusiveness JOIN accounts ON (exclusiveness.account_id = accounts.id_account) JOIN usuarios ON (accounts.id_user = usuarios.id_usuario)
 WHERE user_name LIKE 'Juan%';
 
+
+                --ACCIONES
+                
+ALTER TABLE stages ADD CONSTRAINT FK_subscription_stages
+FOREIGN KEY (id_subscription) REFERENCES subscriptions (id_subscriptor) DELETE ON CASCADE;
                 --- DISPARADORES
                 
 --se genera el id
@@ -296,6 +301,13 @@ BEGIN
 --drop trigger
 DROP TRIGGER TR_ModifiedStages;
 
+--- Las suscripciones podrían eliminarse durante los primeros dos días después de creadas
+CREATE TRIGGER TR_DeleteSubs
+BEFORE DELETE ON subscriptions
+FOR EACH ROW
+BEGIN 
+    IF :old.createdAt <= :old.createdAt + 2   THEN
+        DELETE FROM subscriptions WHERE 
 --
 CREATE TRIGGER TR_IdUser
 BEFORE INSERT ON usuarios
