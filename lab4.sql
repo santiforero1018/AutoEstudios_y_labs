@@ -183,7 +183,7 @@ ALTER TABLE posts ADD CONSTRAINT CH_posts_TText
 CHECK (ptext LIKE '[[:alpha:]]{2,27} [[:alpha:]]{2,26}');
 
 ALTER TABLE stages ADD CONSTRAINT CH_posts_TStatus
-CHECK (status = 'G' OR status = 'P');
+CHECK (VALUES IN ('G', 'P'));
 
 ALTER TABLE usuarios ADD CONSTRAINT CH_usuarios_TIdUsers
 CHECK(REGEXP_LIKE(id_usuario, '^[[:digit:]]{5}'));
@@ -205,7 +205,9 @@ SELECT account_id, code, eorder, ename, price, eduracion
 FROM exclusiveness JOIN accounts ON (exclusiveness.account_id = accounts.id_account) JOIN usuarios ON (accounts.id_user = usuarios.id_usuario)
 WHERE user_name LIKE 'Juan%';
 
---- DISPARADORES
+                --- DISPARADORES
+                
+--se genera el id
 CREATE TRIGGER TR_idSubscription
 BEFORE INSERT ON subscriptions
 FOR EACH ROW
@@ -218,6 +220,7 @@ END TR_idSubscription;
 --- drop trigger 
 DROP TRIGGER TR_idSubscription;
 
+--la fecha createdAt se genera automáticamente
 CREATE TRIGGER TR_actualDatesubs
 BEFORE INSERT ON subscriptions
 FOR EACH ROW
@@ -226,7 +229,8 @@ BEGIN
 END TR_actualDatesubs;
 --- drop trigger 
 DROP TRIGGER TR_actualDatesubs;
-
+--el nivel gratuito de exclusividad debe estar bien definido (se definio como default en la tabla )
+--se crea y asigna la etapa correspondiente al nivel libre de exclusividad
 CREATE TRIGGER TR_Stage
 BEFORE INSERT ON stages
 FOR EACH ROW 
@@ -245,6 +249,54 @@ END TR_Stage;
 
 DROP TRIGGER TR_Stage;
 
+--- solo el detalle y el stage podrían actualizarse
+CREATE TRIGGER TR_ModifiedDetail
+BEFORE UPDATE ON subscriptions
+FOR EACH ROW
+BEGIN
+   IF updating('id_subscriptor') THEN
+    raise_application_error(-20001,'No se puede modificar el id del subscriptor');
+   END IF;
+   IF updating('createdAt') THEN
+    raise_application_error(-20001,'No se puede modificar la fecha');
+   END IF;
+   
+   IF updating('account_id') THEN
+    raise_application_error(-20001,'No se puede modificar el id ');
+   END IF;
+   
+   IF updating('account_idTwo') THEN
+    raise_application_error(-20001,'No se puede modificar el segundo id');
+   END IF;
+ END TR_NotModifiedDetail;
+--drop trigger
+DROP TRIGGER TR_ModifiedDetail;
+
+CREATE TRIGGER TR_ModifiedStages
+BEFORE UPDATE ON subscriptions
+FOR EACH ROW
+BEGIN
+   IF updating('id_subscription') THEN
+    raise_application_error(-20001,'No se puede modificar el id del subscriptor');
+   END IF;
+   
+   IF updating('id_stage') THEN
+    raise_application_error(-20001,'No se puede modificar el id del stage');
+   END IF;
+   
+   IF updating('exc_id') THEN
+    raise_application_error(-20001,'No se puede modificar el id de exclusiveness');
+   END IF;
+   
+   IF updating('exc_order') THEN
+    raise_application_error(-20001,'No se puede modificar el Order de exclusiveness');
+   END IF;
+   
+ END TR_ModifiedStages;
+--drop trigger
+DROP TRIGGER TR_ModifiedStages;
+
+--
 CREATE TRIGGER TR_IdUser
 BEFORE INSERT ON usuarios
 FOR EACH ROW 
