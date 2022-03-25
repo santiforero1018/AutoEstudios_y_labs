@@ -183,7 +183,7 @@ ALTER TABLE posts ADD CONSTRAINT CH_posts_TText
 CHECK (ptext LIKE '[[:alpha:]]{2,27} [[:alpha:]]{2,26}');
 
 ALTER TABLE stages ADD CONSTRAINT CH_posts_TStatus
-CHECK (VALUES IN ('G', 'P'));
+CHECK (status IN ('G', 'P'));
 
 ALTER TABLE usuarios ADD CONSTRAINT CH_usuarios_TIdUsers
 CHECK(REGEXP_LIKE(id_usuario, '^[[:digit:]]{5}'));
